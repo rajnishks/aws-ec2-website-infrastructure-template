@@ -11,10 +11,15 @@ Parameters:
     Type: String
     Default: t2.micro
 
-  ClusterSize:
-    Description: How many EC2 hosts do you want to initially deploy?
+  MinClusterSize:
+    Description: How many minimum EC2 hosts do you want to initially deploy?
     Type: Number
-    Default: 4
+    Default: 1
+
+  MaxClusterSize:
+    Description: How many maximum EC2 hosts do you want to initially deploy?
+    Type: Number
+    Default: 1
 
   VPC:
     Description: Choose which VPC this EC2 cluster should be deployed to
@@ -282,8 +287,8 @@ Resources:
     Properties:
       VPCZoneIdentifier: !Ref PrivateSubnets
       LaunchConfigurationName: !Ref LaunchConfig
-      MinSize: '3'
-      MaxSize: '4'
+      MinSize: !Ref MinClusterSize
+      MaxSize: !Ref MaxClusterSize
       TargetGroupARNs:
         - !Ref ALBTargetGroup
       NotificationConfiguration:
@@ -316,11 +321,6 @@ Resources:
           sources: 
             /var/www/html: "https://github.com/rajnishks/aws-ec2-static-website-template/zipball/master/"
           files:
-            /var/www/html/index.html:
-              content: '<meta http-equiv="refresh" content="0;url=./src/index.html" />'
-              mode: '000644'
-              owner: root
-              group: root
             /etc/cfn/cfn-hup.conf:
               content: !Join 
                 - ''
@@ -376,31 +376,17 @@ Resources:
       AssociatePublicIpAddress: true
       SecurityGroups: [!Ref EC2HostSecurityGroup]
       InstanceType: !Ref InstanceType
-      UserData: !Base64 
-        'Fn::Join':
-          - ''
-          - - |
-              #!/bin/bash -xe
-            - |
-              yum update -y aws-cfn-bootstrap
-            - |
-              yum update -y aws-cli
-            - '/opt/aws/bin/cfn-init -v '
-            - '         --stack '
-            - !Ref 'AWS::StackName'
-            - '         --resource LaunchConfig '
-            - '         --region '
-            - !Ref 'AWS::Region'
-            - |+
-
-            - '/opt/aws/bin/cfn-signal -e $? '
-            - '         --stack '
-            - !Ref 'AWS::StackName'
-            - '         --resource WebServerGroup '
-            - '         --region '
-            - !Ref 'AWS::Region'
-            - |+
-
+      UserData:
+        Fn::Base64:
+          !Sub |
+            #!/bin/bash -xe
+            yum update -y aws-cfn-bootstrap
+            yum update -y aws-cli
+            /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LaunchConfig --region ${AWS::Region}
+            /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource WebServerGroup --region ${AWS::Region}
+            mv /var/www/html/src /var/www/html/ 
+            chmod -R 2775 /var/www/html
+      
   WebServerScaleUpPolicy:
     Type: 'AWS::AutoScaling::ScalingPolicy'
     Properties:

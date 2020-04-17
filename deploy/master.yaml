@@ -5,11 +5,11 @@ Description: >
   Last Modified: 17th March 2020
   Author: Rajnish Srivastava
 
-  Resources:
+Resources:
   VPC:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: https://s3.amazonaws.com/rajnishsrivastava/aws-ec2-static-website-template/cfn-scripts/infrastructure/vpc.yaml
+      TemplateURL: https://s3.amazonaws.com/rajnishsrivastava/aws-ec2-static-website-template/infrastructure/vpc.yaml
       Parameters:
         EnvironmentName: !Ref AWS::StackName
         VpcCIDR: 10.0.0.0/16
@@ -21,7 +21,7 @@ Description: >
   SecurityGroups:
      Type: AWS::CloudFormation::Stack
      Properties:
-       TemplateURL: https://s3.amazonaws.com/rajnishsrivastava/aws-ec2-static-website-template/cfn-scripts/infrastructure/security-groups.yaml
+       TemplateURL: https://s3.amazonaws.com/rajnishsrivastava/aws-ec2-static-website-template/infrastructure/security-groups.yaml
        Parameters:
          EnvironmentName: !Ref AWS::StackName
          VPC: !GetAtt VPC.Outputs.VPC
@@ -29,11 +29,12 @@ Description: >
   Application:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: https://s3.amazonaws.com/rajnishsrivastava/aws-ec2-static-website-template/cfn-scripts/infrastructure/application.yaml
+      TemplateURL: https://s3.amazonaws.com/rajnishsrivastava/aws-ec2-static-website-template/infrastructure/application.yaml
       Parameters:
         EnvironmentName: !Ref AWS::StackName
         InstanceType: t2.micro
-        ClusterSize: 4
+        MinClusterSize: 1
+        MaxClusterSize: 1
         VPC: !GetAtt VPC.Outputs.VPC
         EC2HostSecurityGroup: !GetAtt SecurityGroups.Outputs.EC2HostSecurityGroup
         LoadBalancerSecurityGroup: !GetAtt SecurityGroups.Outputs.LoadBalancerSecurityGroup
