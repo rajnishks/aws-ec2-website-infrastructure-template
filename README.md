@@ -6,6 +6,10 @@ The purpose of this starter template is to demonstrate how a static website can 
 
 _Note: There are alternative ways of running static websites in AWS that are simpler and recommended, as an example static websites can be easily deployed and delivered via S3_
 
+## TECHNICAL ARCHITECTURE
+The following diagram represents the architecture setup in the AWS environment
+![Infrastructure Diagram](images/aws-simple-ec2-app.png)
+
 ## HOW TO USE?
 
 ### Pre-requisites
