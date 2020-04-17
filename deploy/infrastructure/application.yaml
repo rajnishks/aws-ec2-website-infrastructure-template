@@ -384,8 +384,8 @@ Resources:
             yum update -y aws-cli
             /opt/aws/bin/cfn-init -v --stack ${AWS::StackName} --resource LaunchConfig --region ${AWS::Region}
             /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource WebServerGroup --region ${AWS::Region}
-            mv /var/www/html/src /var/www/html/ 
             chmod -R 2775 /var/www/html
+            mv -f /var/www/html/src/* /var/www/html/ 
       
   WebServerScaleUpPolicy:
     Type: 'AWS::AutoScaling::ScalingPolicy'
