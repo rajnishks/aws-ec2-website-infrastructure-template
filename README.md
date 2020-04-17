@@ -8,6 +8,7 @@ _Note: There are alternative ways of running static websites in AWS that are sim
 
 ## TECHNICAL ARCHITECTURE
 The following diagram represents the architecture setup in the AWS environment
+
 ![Infrastructure Diagram](images/aws-simple-ec2-app.png)
 
 ## HOW TO USE?
