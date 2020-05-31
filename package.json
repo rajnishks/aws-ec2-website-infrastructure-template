@@ -1,6 +1,6 @@
 {
-  "name": "aws-ec2-webapp-react-typescript-template",
-  "description": "Reference implementation for deploying a webapplication using AWS EC2 servers",
+  "name": "aws-ec2-static-website-template",
+  "description": "Reference implementation for deploying a static website using AWS EC2 servers",
   "version": "1.0.0",
   "author": "Rajnish Srivastava",
   "license": "MIT",
@@ -9,14 +9,14 @@
     "awsProfile": "la",
     "awsBucket": "s3-sample-web-app-bucket2020",
     "buildNumber": "1.0.0-230520201612",
-    "cfnMainTemplateFile": "file://deploy/cloud-formation/master.yaml"
+    "cfnMainTemplateFile": "file://deploy/master.yaml"
   },
   "scripts": {
-    "@comment app": "primary commands for running the application, use 'deploy' for installing the app. In case of cloud formation, invoke 'update' for installing updates",
-    "deploy:tf": "npm run web:build & npm run web:package & npm run repo:push & npm run tf:deploy",
-    "deploy:cfn": "npm run web:build & npm run web:package & npm run repo:push & npm run cfn:create",
-    "update:cfn": "npm run web:build & npm run web:package & npm run repo:push & npm run cfn:update",
-    
+    "@comment app": "primary commands for running the application, use 'deploy' for installing the app and 'update' for installing updates",
+    "init": "npm install & npm run repo:create",
+    "deploy": "npm run web:build & npm run web:package & npm run repo:push & npm run cfn:create",
+    "update": "npm run web:build & npm run web:package & npm run repo:push & npm run cfn:update",
+
     "@comment web": "creates the package for deployment",
     "web:build": "cd web & npm install & npm run build",
     "web:package": "mkdirp dist & rimraf dist/* & cd web/build & bestzip ../../dist/app.zip *",
@@ -26,27 +26,19 @@
     "repo:push": "cross-var aws s3api put-object --bucket=$npm_package_config_awsBucket --key app-$npm_package_config_buildNumber.zip --body dist/app.zip --profile=$npm_package_config_awsProfile",
     
     "@comment cfn": "cloudformation related scripts",
-    "cfn:create": "cross-var aws cloudformation create-stack --stack-name=$npm_package_config_awsStackName --profile=$npm_package_config_awsProfile --template-body=cfnMainTemplateFile --capabilities CAPABILITY_IAM --parameters ParameterKey=BuildNumber,ParameterValue=$npm_package_config_buildNumber",
-    "cfn:update": "cross-var aws cloudformation update-stack --stack-name=$npm_package_config_awsStackName --profile=$npm_package_config_awsProfile --template-body=cfnMainTemplateFile --capabilities CAPABILITY_IAM --parameters ParameterKey=BuildNumber,ParameterValue=$npm_package_config_buildNumber",
+    "cfn:create": "cross-var aws cloudformation create-stack --stack-name=$npm_package_config_awsStackName --profile=$npm_package_config_awsProfile --template-body=$npm_package_config_cfnMainTemplateFile --capabilities CAPABILITY_IAM --parameters ParameterKey=BuildNumber,ParameterValue=$npm_package_config_buildNumber",
+    "cfn:update": "cross-var aws cloudformation update-stack --stack-name=$npm_package_config_awsStackName --profile=$npm_package_config_awsProfile --template-body=$npm_package_config_cfnMainTemplateFile --capabilities CAPABILITY_IAM --parameters ParameterKey=BuildNumber,ParameterValue=$npm_package_config_buildNumber",
     "cfn:delete": "cross-var aws cloudformation delete-stack --stack-name=$npm_package_config_awsStackName --profile=$npm_package_config_awsProfile",
     "cfn:validate": "npm run cfn:validate:master & npm run cfn:validate:vpc & npm run cfn:validate:security-groups & npm run cfn:validate:cloudtrail & npm run cfn:validate:application",
-    "cfn:validate:master": "aws cloudformation validate-template --template-body=$npm_package_config_cfnTemplateFile",
-    "cfn:validate:vpc": "aws cloudformation validate-template --template-body=file://deploy/cloud-formation/infrastructure/vpc.yaml",
-    "cfn:validate:security-groups": "aws cloudformation validate-template --template-body=file://deploy/cloud-formation/infrastructure/security-groups.yaml",
-    "cfn:validate:cloudtrail": "aws cloudformation validate-template --template-body=file://deploy/cloud-formation/infrastructure/cloudtrail.yaml",
-    "cfn:validate:application": "aws cloudformation validate-template --template-body=file://deploy/cloud-formation/infrastructure/application.yaml",
-
-    "@comment tf": "Terraform related scripts",
-    "tf:init": "cd deploy/terraform & terraform init",
-    "tf:plan": "cd deploy/terraform & terraform plan",
-    "tf:deploy": "cd deploy/terraform & terraform apply",
-    "tf:graph": "cd deploy/terraform & terraform graph | dot -Tsvg > graph.svg"
+    "cfn:validate:master": "cross-var aws cloudformation validate-template --template-body=$npm_package_config_cfnMainTemplateFile",
+    "cfn:validate:vpc": "aws cloudformation validate-template --template-body=file://deploy/infrastructure/vpc.yaml",
+    "cfn:validate:security-groups": "aws cloudformation validate-template --template-body=file://deploy/infrastructure/security-groups.yaml",
+    "cfn:validate:cloudtrail": "aws cloudformation validate-template --template-body=file://deploy/infrastructure/cloudtrail.yaml",
+    "cfn:validate:application": "aws cloudformation validate-template --template-body=file://deploy/infrastructure/application.yaml"
   },
   "keywords": [
     "aws",
     "cloudformation",
-    "cdk",
-    "terraform",
     "webapp",
     "ec2",
     "react",

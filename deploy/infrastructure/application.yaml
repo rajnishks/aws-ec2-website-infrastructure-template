@@ -179,24 +179,8 @@ Resources:
     Type: 'AWS::AutoScaling::LaunchConfiguration'
     Metadata:
       Comment: Install a simple application
-      AWS::CloudFormation::Authentication: 
-        S3AccessCreds: 
-          type: S3
-          buckets: 
-            - !Sub ${BucketName}
-          roleName: 
-            Ref: EC2Role
       AWS::CloudFormation::Init:
         config:
-          packages:
-            yum:
-              httpd: []
-          sources: 
-            /var/www/html: !Sub
-                - >-
-                  https://${BucketName}.s3.amazonaws.com/app-${Version}.zip
-                - BucketName: !Ref BucketName
-                  Version: !Ref AppVersion
           files:
             /tmp/cwlogs/apacheaccess.conf:
               content: !Sub |
@@ -259,12 +243,17 @@ Resources:
             yum install -y awslogs
             systemctl start awslogsd
             systemctl enable awslogsd.service
+            # Install apache2
+            yum install -y httpd
+            systemctl start httpd
+            systemctl enable httpd
             # Setup the build folder contents in apache html folder
-            chmod -R 2775 /var/www/html
+            aws s3api get-object --bucket ${BucketName} --key app-${AppVersion}.zip build.zip
+            unzip ./build.zip -d /var/www/html
             # Log application being deployed
             echo 'Updating version of stack ${AppVersion}'
             # All done so signal success
-            /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource WebServerGroup --region ${AWS::Region} 
+            /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackName} --resource WebServerGroup --region ${AWS::Region}
   
   WebServerLogGroup:
     Type: AWS::Logs::LogGroup

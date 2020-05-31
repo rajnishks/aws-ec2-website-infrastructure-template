@@ -1,9 +1,9 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: >
 
-  This template deploys an EC2 based website in AWS cloud environment.
+  This template deploys an EC2 based static website in AWS cloud environment.
 
-  Last Modified: 25th May 2020
+  Last Modified: 1st June 2020
   Author: Rajnish Srivastava
 
 Parameters:
@@ -15,7 +15,7 @@ Resources:
   VPC:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: https://s3.amazonaws.com/rajnishsrivastava/aws-ec2-webapp-refarch-template/cfn-scripts/vpc.yaml
+      TemplateURL: https://s3.amazonaws.com/rajnishsrivastava/aws-ec2-static-website-template/cfn-scripts/vpc.yaml
       Parameters:
         EnvironmentName: !Ref AWS::StackName
         VpcCIDR: 10.0.0.0/16
@@ -27,7 +27,7 @@ Resources:
   SecurityGroups:
      Type: AWS::CloudFormation::Stack
      Properties:
-       TemplateURL: https://s3.amazonaws.com/rajnishsrivastava/aws-ec2-webapp-refarch-template/cfn-scripts/security-groups.yaml
+       TemplateURL: https://s3.amazonaws.com/rajnishsrivastava/aws-ec2-static-website-template/cfn-scripts/security-groups.yaml
        Parameters:
          EnvironmentName: !Ref AWS::StackName
          VPC: !GetAtt VPC.Outputs.VPC
@@ -35,12 +35,12 @@ Resources:
   CloudTrail:
      Type: AWS::CloudFormation::Stack
      Properties:
-       TemplateURL: https://s3.amazonaws.com/rajnishsrivastava/aws-ec2-webapp-refarch-template/cfn-scripts/cloudtrail.yaml
+       TemplateURL: https://s3.amazonaws.com/rajnishsrivastava/aws-ec2-static-website-template/cfn-scripts/cloudtrail.yaml
 
   Application:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: https://s3.amazonaws.com/rajnishsrivastava/aws-ec2-webapp-refarch-template/cfn-scripts/application.yaml
+      TemplateURL: https://s3.amazonaws.com/rajnishsrivastava/aws-ec2-static-website-template/cfn-scripts/application.yaml
       Parameters:
         EnvironmentName: !Ref AWS::StackName
         InstanceType: t2.micro

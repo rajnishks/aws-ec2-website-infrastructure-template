@@ -55,11 +55,15 @@ Please follow the below steps:
 * Update the "aws" attribute in package json with configuration specific details
     * Stack name for setting up the cloudformation stack
     * AWS profile to be used while invoking the cloudformation 
-* Update the "web" folder with code required to run your web application. Note that the following steps are custom to the "react-boilerplate-typescript" template
-    * Run "cd web"
-    * Run "npm run build"
-* To deploy the application, run the following command:
-    * Run "npm install" to install the dependencies
+* Update the "web" folder with code required to run your web application.
+    * Update "web:build" and "web:package" scripts as per your application in package.json
+* To deploy the application for the first time, run the following command:
+    * Run "npm run init" to install the dependencies and setup work.
     * To deploy the application for first time, run "npm run deploy"
-    * For installing updates, run "npm run update"
-* The URL of the deployed application is available in cloudformation stack output.
+    * The URL of the deployed application is available in cloudformation stack output.
+* To deploy updates to the application, run the following command:
+    * Make the code changes and update 'buildNumber' parameter in package.json
+    * Run "npm run update"
+
+### CI-CD
+This template uses an extremely simplistic approach to push updates - the build number updates 'userdata' script which triggers ec2 instance updates. There are plenty of examples of how to do CI-CD right, teams can pick a workflow which suits their needs.
