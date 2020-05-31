@@ -1,0 +1,61 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+
+  This template deploys an EC2 based website in AWS cloud environment.
+
+  Last Modified: 25th May 2020
+  Author: Rajnish Srivastava
+
+Parameters:
+  BuildNumber:
+    Description: Specifies the build number to be deployed
+    Type: String
+
+Resources:
+  VPC:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://s3.amazonaws.com/rajnishsrivastava/aws-ec2-webapp-refarch-template/cfn-scripts/vpc.yaml
+      Parameters:
+        EnvironmentName: !Ref AWS::StackName
+        VpcCIDR: 10.0.0.0/16
+        PublicSubnet1CIDR: 10.0.1.0/28
+        PublicSubnet2CIDR: 10.0.2.0/28
+        PrivateSubnet1CIDR: 10.0.3.0/24
+        PrivateSubnet2CIDR: 10.0.4.0/24
+
+  SecurityGroups:
+     Type: AWS::CloudFormation::Stack
+     Properties:
+       TemplateURL: https://s3.amazonaws.com/rajnishsrivastava/aws-ec2-webapp-refarch-template/cfn-scripts/security-groups.yaml
+       Parameters:
+         EnvironmentName: !Ref AWS::StackName
+         VPC: !GetAtt VPC.Outputs.VPC
+  
+  CloudTrail:
+     Type: AWS::CloudFormation::Stack
+     Properties:
+       TemplateURL: https://s3.amazonaws.com/rajnishsrivastava/aws-ec2-webapp-refarch-template/cfn-scripts/cloudtrail.yaml
+
+  Application:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://s3.amazonaws.com/rajnishsrivastava/aws-ec2-webapp-refarch-template/cfn-scripts/application.yaml
+      Parameters:
+        EnvironmentName: !Ref AWS::StackName
+        InstanceType: t2.micro
+        BucketName: s3-sample-web-app-bucket2020
+        AppVersion: !Ref BuildNumber
+        MinClusterSize: 1
+        MaxClusterSize: 4
+        VPC: !GetAtt VPC.Outputs.VPC
+        EC2HostSecurityGroup: !GetAtt SecurityGroups.Outputs.EC2HostSecurityGroup
+        LoadBalancerSecurityGroup: !GetAtt SecurityGroups.Outputs.LoadBalancerSecurityGroup
+        PublicSubnets: !GetAtt VPC.Outputs.PublicSubnets
+        PrivateSubnets: !GetAtt VPC.Outputs.PrivateSubnets
+        OperatorEMail: awstestmail@yopmail.com
+
+Outputs:
+  WebsiteServiceUrl:
+     Description: The URL endpoint for the website
+     Value: !GetAtt Application.Outputs.URL
