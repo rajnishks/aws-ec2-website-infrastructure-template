@@ -24,7 +24,7 @@ All the above approaches have their pros and cons. This template focuses on appr
 ## TECHNICAL DETAILS
 The template starts with a most basic installation setup in AWS required to run a 24*7 website - N EC2 servers running in different availability zones managed by a load balancer (refer diagram below).
 
-![Infrastructure Diagram](images/aws-simple-ec2-app.png)
+![Infrastructure Diagram](images/aws-simple-ec2-app.jpg)
 
 In summary, the following infrastructure is being created:
 1. EC2 servers deployed in different AZs registered with a load balancer.
