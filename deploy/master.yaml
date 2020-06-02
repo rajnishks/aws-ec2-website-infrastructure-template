@@ -54,8 +54,18 @@ Resources:
         PublicSubnets: !GetAtt VPC.Outputs.PublicSubnets
         PrivateSubnets: !GetAtt VPC.Outputs.PrivateSubnets
         OperatorEMail: awstestmail@yopmail.com
+  
+  CloudFront:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://s3.amazonaws.com/rajnishsrivastava/aws-ec2-static-website-template/cfn-scripts/cloudfront.yaml
+      Parameters:
+        Domain: !GetAtt Application.Outputs.Domain
 
 Outputs:
-  WebsiteServiceUrl:
-     Description: The URL endpoint for the website
+  LoadBalancerUrl:
+     Description: The URL endpoint for the load balancer
      Value: !GetAtt Application.Outputs.URL
+  CloudFrontUrl:
+     Description: The URL endpoint for the cloudfront
+     Value: !GetAtt CloudFront.Outputs.Domain

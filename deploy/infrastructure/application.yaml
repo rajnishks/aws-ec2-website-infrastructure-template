@@ -181,6 +181,9 @@ Resources:
       Comment: Install a simple application
       AWS::CloudFormation::Init:
         config:
+          packages:
+            yum:
+              httpd: []
           files:
             /tmp/cwlogs/apacheaccess.conf:
               content: !Sub |
@@ -244,9 +247,9 @@ Resources:
             systemctl start awslogsd
             systemctl enable awslogsd.service
             # Install apache2
-            yum install -y httpd
-            systemctl start httpd
-            systemctl enable httpd
+            #yum install -y httpd
+            #systemctl start httpd
+            #systemctl enable httpd
             # Setup the build folder contents in apache html folder
             aws s3api get-object --bucket ${BucketName} --key app-${AppVersion}.zip build.zip
             unzip ./build.zip -d /var/www/html
@@ -361,6 +364,14 @@ Resources:
       ComparisonOperator: LessThanThreshold
 
 Outputs:
+  Domain:
+    Description: The domain of the website
+    Value: !Join 
+      - ''
+      - - ''
+        - !GetAtt 
+          - ApplicationLoadBalancer
+          - DNSName
   URL:
     Description: The URL of the website
     Value: !Join 

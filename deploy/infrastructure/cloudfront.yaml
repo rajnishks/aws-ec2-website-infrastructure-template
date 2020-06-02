@@ -1,0 +1,40 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  Domain:
+    Description: Domain name of the load balancer
+    Type: String
+Resources:
+  AppDistribution:
+    Type: 'AWS::CloudFront::Distribution'
+    Properties:
+      DistributionConfig:
+        Origins:
+        - DomainName: !Ref Domain
+          Id: myCustomOrigin
+          CustomOriginConfig:
+            HTTPPort: '80'
+            HTTPSPort: '443'
+            OriginProtocolPolicy: http-only
+        Enabled: 'true'
+        DefaultRootObject: index.html
+        DefaultCacheBehavior:
+          TargetOriginId: myCustomOrigin
+          SmoothStreaming: 'false'
+          ForwardedValues:
+            QueryString: 'false'
+            Cookies:
+              Forward: all
+          ViewerProtocolPolicy: allow-all
+        CustomErrorResponses:
+        - ErrorCode: '404'
+          ResponsePagePath: "/error-pages/404.html"
+          ResponseCode: '200'
+          ErrorCachingMinTTL: '30'
+
+Outputs:
+  DistributionId:
+    Description: 'CloudFront Distribution ID'
+    Value: !Ref AppDistribution
+  Domain:
+    Description: 'Cloudfront Domain'
+    Value: !GetAtt AppDistribution.DomainName

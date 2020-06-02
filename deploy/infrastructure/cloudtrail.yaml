@@ -39,6 +39,7 @@ Resources:
   TrailBucket:
     Condition: InternalBucket
     Type: 'AWS::S3::Bucket'
+    DeletionPolicy: Retain
     Properties: {}
   TrailBucketPolicy:
     Condition: InternalBucket
