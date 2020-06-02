@@ -57,7 +57,8 @@ Please follow the below steps:
     * Stack name for setting up the cloudformation stack
     * AWS profile to be used while invoking the cloudformation 
 3. Update the "web" folder with code required to run your web application.
-    * Update "web:build" and "web:package" scripts as per your application in package.json
+    * Update "web:build" scripts as per your application in package.json.
+    * The deployment setup assumes that the "web:build" script will output the build output in "web/build" directory.
 4. To deploy the application for the first time, run the following command:
     * Run "npm run init" to install the dependencies and setup release repository in S3.
     * To deploy the application for first time, run "npm run deploy"
