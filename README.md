@@ -36,7 +36,7 @@ In summary, the following infrastructure is being created:
 5. Enabling developer to remote into EC2 servers using AWS Systems Manager.
 6. Use of Cloud watch for monitoring purposes.
 7. Enabling CloudTrail to support auditing requirements.
-8. Improving speed of delivery via use of cloudfront cache
+8. Improving performance via use of cloudfront cache.
 
 ### Cloudformation Templates
 For ease of setting up / maintaining the infrastructure, the template provides infrastructure automation scripts using AWS Cloud Formation. Following templates are provided:
@@ -57,17 +57,21 @@ In order to run the application, the following must be completed before initiati
 
 ### Installation Steps
 Please follow the below steps:
-1. Update the infrastructure templates as per your requirement.
-    * Once the changes are made, push the nested stack templates to a S3 public bucket of your choice.
-    * Update the URL of these templates in master.yaml
-    * Update UserData attribute in LaunchConfig node of application.yaml as per requirement.
-    * Validate the template using "npm run stack:validate"
-2. Update the "aws" attribute in package json with configuration specific details
-    * Stack name for setting up the cloudformation stack
-    * AWS profile to be used while invoking the cloudformation 
-3. Update the "web" folder with code required to run your web application.
+1. Update the "web" folder with code required to run your web application.
     * Update "web:build" scripts as per your application in package.json.
     * The deployment setup assumes that the "web:build" script will output the build output in "web/build" directory.
+2. Update the infrastructure templates as per your requirement.
+    * Once the changes are made, push the nested stack templates to a S3 public bucket of your choice.
+    * Update the parameters defined for nested stacks and URL of these nested stacks in master.yaml.
+    * Update UserData attribute in LaunchConfig node of application.yaml as per requirement.
+    * Validate the template using "npm run stack:validate"
+3. Update the "aws" attribute in package json with configuration specific details
+    * awsStackName: Stack name for setting up the cloudformation stack.
+    * awsProfile: AWS profile to be used while invoking cloudformation and cloudfront invalidation script.
+    * awsRegion: Region for deploying the stack.
+    * awsBucket: S3 bucket where release packages are stored and used for deployment.
+    * buildNumber: Build number to be used for deployment.
+    * cfnMainTemplateFile: The primary template for invoking the cloud formation script.
 4. To deploy the application for the first time, run the following command:
     * Run "npm run init" to install the dependencies and setup release repository in S3.
     * To deploy the application for first time, run "npm run deploy"
