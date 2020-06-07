@@ -74,11 +74,20 @@ Please follow the below steps:
     * cfnMainTemplateFile: The primary template for invoking the cloud formation script.
 4. To deploy the application for the first time, run the following command:
     * Run `npm run init` to install the dependencies and setup release repository in S3.
-    * To deploy the application for first time, run `npm run deploy`
-    * The URL of the deployed application is available in cloudformation stack output.
+    * To deploy the application for first time, run `npm run deploy`. Following steps are executed while deploying the application:
+      * npm run web:build - builds the codebase and finalizes the 'web\build' directory.
+      * npm run web:zip - creates a 'deployment zip' by zipping the content of 'web\build' directory.
+      * npm run repo:push - pushes the deployment zip to the s3 release repository bucket with zip name set as specified build number.
+      * npm run cfn:create - creates the stack in aws, deploys the application on EC2 by downloading the release zip from S3.
+    * The URL of the deployed application is available in cloudformation stack output via the CloudFrontUrl variable.
 5. To deploy updates to the application, run the following command:
     * Make the code changes and update `buildNumber` parameter in package.json
-    * Run `npm run update`, this will update the aws infrastructure
+    * Run `npm run update`, this will update the aws infrastructure. Following steps are executed while deploying the application:
+      * npm run web:build - builds the codebase and finalizes the 'web\build' directory.
+      * npm run web:zip - creates a 'deployment zip' by zipping the content of 'web\build' directory.
+      * npm run repo:push - pushes the deployment zip to the s3 release repository bucket with zip name set as specified build number.
+      * npm run cfn:update - updates the stack in aws, specifying a different buildNumber than installed in AWS trigger replacement of EC2 instances in AWS.
+      * npm run cfront:invalidate - invalidates the cloudfront cache.
 
 ### CI-CD
 This template uses an extremely simplistic approach to push updates - the build number updates 'userdata' script which triggers ec2 instance updates. There are plenty of examples of how to do CI-CD right on the web - from a simple workflow that suits a small team to a more complex scenario that suits a large team. Developers can pick a workflow which suits their needs.
