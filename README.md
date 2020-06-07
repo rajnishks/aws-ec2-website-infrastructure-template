@@ -1,7 +1,7 @@
-# aws-ec2-static-website-template
+# aws-ec2-website-infrastructure-template
 
 ## OBJECTIVE
-The purpose of this starter template is to demonstrate how a static website can be deployed and maintained in AWS.
+The purpose of this starter template is to demonstrate how a website can be deployed and maintained in AWS using EC2 servers.
 
 ### Audience
 To showcase how applications can be deployed, I have used the following starter template: https://github.com/facebook/create-react-app. The deployment approach shown in this template does not depend on the type of framework chosen. You are free to choose any other kind of framework - angular, vue etc.
@@ -24,6 +24,8 @@ All the above approaches have their pros and cons. This template focuses on appr
 ## TECHNICAL DETAILS
 The template starts with a most basic installation setup in AWS required to run a 24*7 website - "N" EC2 servers running in different availability zones managed by a load balancer (refer diagram below).
 
+### Infrastructure Diagram
+
 ![Infrastructure Diagram](images/aws-simple-ec2-app.jpg)
 
 In summary, the following infrastructure is being created:
@@ -34,9 +36,16 @@ In summary, the following infrastructure is being created:
 5. Enabling developer to remote into EC2 servers using AWS Systems Manager.
 6. Use of Cloud watch for monitoring purposes.
 7. Enabling CloudTrail to support auditing requirements.
-8. Use of cloudfront for improving performance of the application
+8. Improving speed of delivery via use of cloudfront cache
 
-For ease of setting up / maintaining the infrastructure, the template provides infrastructure automation scripts using AWS Cloud Formation.
+### Cloudformation Templates
+For ease of setting up / maintaining the infrastructure, the template provides infrastructure automation scripts using AWS Cloud Formation. Following templates are provided:
+1. master.yaml: the primary cloudformation template for setting up the infrastructure.
+2. vpc.yaml: the template responsible for setting up vpc and subnets
+3. security-groups.yaml: the template responsible for setting up relevant security groups
+4. cloudtrail.yaml: the template responsible for setting up cloudtrail for auditing purposes
+5. application.yaml: the template responsible for setting up the load balancer and ec2 servers
+6. cloudfront.yaml: the template responsible for setting up the cloudfront distribution
 
 ## HOW TO USE?
 
@@ -65,7 +74,7 @@ Please follow the below steps:
     * The URL of the deployed application is available in cloudformation stack output.
 5. To deploy updates to the application, run the following command:
     * Make the code changes and update 'buildNumber' parameter in package.json
-    * Run "npm run update"
+    * Run "npm run update", this will update the aws infrastructure
 
 ### CI-CD
 This template uses an extremely simplistic approach to push updates - the build number updates 'userdata' script which triggers ec2 instance updates. There are plenty of examples of how to do CI-CD right on the web - from a simple workflow that suits a small team to a more complex scenario that suits a large team. Developers can pick a workflow which suits their needs.

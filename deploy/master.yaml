@@ -3,7 +3,7 @@ Description: >
 
   This template deploys an EC2 based static website in AWS cloud environment.
 
-  Last Modified: 1st June 2020
+  Last Modified: 7th June 2020
   Author: Rajnish Srivastava
 
 Parameters:
@@ -66,6 +66,9 @@ Outputs:
   LoadBalancerUrl:
      Description: The URL endpoint for the load balancer
      Value: !GetAtt Application.Outputs.URL
+  CloudFrontDistributionId:
+     Description: The ID of the cloudfront distribution
+     Value: !GetAtt CloudFront.Outputs.DistributionId
   CloudFrontUrl:
      Description: The URL endpoint for the cloudfront
      Value: !GetAtt CloudFront.Outputs.Domain

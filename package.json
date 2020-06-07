@@ -7,24 +7,23 @@
   "config": {
     "awsStackName": "SampleWebApp",
     "awsProfile": "la",
+    "awsRegion": "us-east-1",
     "awsBucket": "s3-sample-web-app-bucket2020",
-    "buildNumber": "1.0.0-230520201612",
+    "buildNumber": "1.0.0-070620200119",
     "cfnMainTemplateFile": "file://deploy/master.yaml"
   },
   "scripts": {
-    "@comment app": "primary commands for running the application, use 'deploy' for installing the app and 'update' for installing updates",
+    "@comment app": "primary commands for running the application, use 'deploy' for installing the app and 'update' for installing updates to the app",
     "init": "npm install & npm run repo:create",
-    "deploy": "npm run web:build & npm run web:package & npm run repo:push & npm run cfn:create",
-    "update": "npm run web:build & npm run web:package & npm run repo:push & npm run cfn:update",
-    
+    "deploy": "npm run web:build & npm run web:zip & npm run repo:push & npm run cfn:create",
+    "update": "npm run web:build & npm run web:zip & npm run repo:push & npm run cfn:update & npm run cfront:invalidate",
+    "remove": "npm run cfn:delete",
     "@comment web": "creates the package for deployment",
     "web:build": "cd web & npm install & npm run build",
-    "web:package": "mkdirp dist & rimraf dist/* & cd web/build & bestzip ../../dist/app.zip *",
-    
+    "web:zip": "mkdirp dist & rimraf dist/* & cd web/build & bestzip ../../dist/app.zip *",
     "@comment repo": "repository related commands - where the deployment package is stored, sort of like an elastic container registry...used s3 bucket.",
     "repo:create": "cross-var aws s3api create-bucket --bucket=$npm_package_config_awsBucket --profile=$npm_package_config_awsProfile",
     "repo:push": "cross-var aws s3api put-object --bucket=$npm_package_config_awsBucket --key app-$npm_package_config_buildNumber.zip --body dist/app.zip --profile=$npm_package_config_awsProfile",
-    
     "@comment cfn": "cloudformation related scripts",
     "cfn:create": "cross-var aws cloudformation create-stack --stack-name=$npm_package_config_awsStackName --profile=$npm_package_config_awsProfile --template-body=$npm_package_config_cfnMainTemplateFile --capabilities CAPABILITY_IAM --parameters ParameterKey=BuildNumber,ParameterValue=$npm_package_config_buildNumber",
     "cfn:update": "cross-var aws cloudformation update-stack --stack-name=$npm_package_config_awsStackName --profile=$npm_package_config_awsProfile --template-body=$npm_package_config_cfnMainTemplateFile --capabilities CAPABILITY_IAM --parameters ParameterKey=BuildNumber,ParameterValue=$npm_package_config_buildNumber",
@@ -35,7 +34,9 @@
     "cfn:validate:security-groups": "aws cloudformation validate-template --template-body=file://deploy/infrastructure/security-groups.yaml",
     "cfn:validate:cloudtrail": "aws cloudformation validate-template --template-body=file://deploy/infrastructure/cloudtrail.yaml",
     "cfn:validate:application": "aws cloudformation validate-template --template-body=file://deploy/infrastructure/application.yaml",
-    "cfn:validate:cloudfront": "aws cloudformation validate-template --template-body=file://deploy/infrastructure/cloudfront.yaml"
+    "cfn:validate:cloudfront": "aws cloudformation validate-template --template-body=file://deploy/infrastructure/cloudfront.yaml",
+    "@comment cloudfront": "cloudfront related scripts",
+    "cfront:invalidate": "cross-var node scripts/cloudfront-invalidate.js $npm_package_config_awsProfile $npm_package_config_awsRegion $npm_package_config_awsStackName"
   },
   "keywords": [
     "aws",
@@ -47,9 +48,10 @@
   ],
   "dependencies": {},
   "devDependencies": {
-    "cross-var": "^1.1.0",
+    "cross-var": "1.1.x",
     "bestzip": "2.1.x",
     "rimraf": "3.0.x",
-    "mkdirp": "1.0.x"
+    "mkdirp": "1.0.x",
+    "aws-cloudfront-invalidate": "0.1.x"
   }
 }
